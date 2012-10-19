@@ -1,0 +1,12 @@
+<resources>
+
+    <string name="app_name">NewTests</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_main">Tests</string>
+    <string name="title_activity_trace">Trace Route</string>
+    <string name="TracerouteButton">Traceroute</string>
+    <string name="LossTestButton">Loss Test</string>
+    <string name="TraceResultField"> </string>
+
+</resources>
