@@ -33,21 +33,31 @@ public class TracerouteWorker
 		boolean found = false;
 		String parsedResult= "";
 		int pos;
+		int count = 0;
 		for(pos=0; pos<result.length(); pos++)
 		{
 			if(result.charAt(pos)=='F')
 			{
 				found = true;
 			}
-			
+			if(result.charAt(pos)=='\n')
+			{
+				count++;
+			}
 			if(found==true){
 				pos+=5;
+				Log.d("TraceWorker", "" + count);
+				if(count>7)
+				{
+					parsedResult+="Hop details missing\n\n";
+				}
+				count=0;
 				while(result.charAt(pos)!=' ')
 				{
 					parsedResult += result.charAt(pos);
 					pos++;
 				}
-				parsedResult+='\n';
+				parsedResult+="\n\n";
 				found = false;
 			}
 		}
