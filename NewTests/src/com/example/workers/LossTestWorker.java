@@ -1,0 +1,110 @@
+package com.example.workers;
+
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+
+import android.util.Log;
+
+public class LossTestWorker implements Runnable
+{
+	private static final String SERVER_ADDRESS = "ruggles.gtnoise.net";
+	private static final int PORT = 9916;
+	private static final String REQUEST_ACCEPTED = "Request Accepted";
+	public double loss; 
+	private DatagramPacket getLossTestPacket()
+	{
+		byte[] losspacketbuffer = new byte[100];
+		for(int i=0; i < 100; i++)
+		{
+			losspacketbuffer[i] = 123;
+		}
+		
+		DatagramPacket losspacket = new DatagramPacket(losspacketbuffer, losspacketbuffer.length);
+		return losspacket;
+	}
+	private
+	DatagramPacket
+	getRequestPacket() 
+	{
+		String request = "startrequest";
+		byte[] start_request_array = request.getBytes();
+		DatagramPacket request_packet = new DatagramPacket(start_request_array, start_request_array.length);
+		return request_packet;
+	}
+	
+	private
+	DatagramPacket
+	getEndPacket()
+	{
+		String endstring = "endingtest";
+		byte[] endtestbuffer = endstring.getBytes();
+		DatagramPacket end_packet = new DatagramPacket(endtestbuffer, endtestbuffer.length);
+		return end_packet;
+	}
+
+	public void run()
+	{
+		DatagramSocket clientSocket = null;
+		DatagramPacket mPacket = getLossTestPacket();
+		byte[] receive_data = null;
+		try 
+		{
+			
+			clientSocket = new DatagramSocket();
+			clientSocket.connect(InetAddress.getByName(SERVER_ADDRESS), PORT);
+			clientSocket.send(getRequestPacket());
+			receive_data = new byte[100];
+			DatagramPacket receive_packet = new DatagramPacket(receive_data, receive_data.length);
+			clientSocket.receive(receive_packet);
+			String received = new String(receive_packet.getData(),0,receive_packet.getLength());
+			
+			if(received.equals(REQUEST_ACCEPTED))
+			{
+				Log.d("Loss Test worker", "Starting to send");
+				for (int i = 0; i<1000; i++)
+				{
+					clientSocket.send(mPacket);
+					Thread.sleep(100);
+				}
+				clientSocket.send(getEndPacket());
+				clientSocket.receive(receive_packet);
+				int numberofpackets = Integer.parseInt(new String(receive_packet.getData(), 0 , receive_packet.getLength()));
+				loss = (double) numberofpackets/10.0;
+			}
+			received = null;
+		
+		}
+		
+		
+		catch (SocketException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		catch (UnknownHostException e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		finally
+		{
+			if(clientSocket!=null)
+			{
+				clientSocket.close();
+			}
+			receive_data = null;
+			mPacket = null;
+			
+		}
+	}
+}

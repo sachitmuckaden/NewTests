@@ -8,5 +8,6 @@
     <string name="TracerouteButton">Traceroute</string>
     <string name="LossTestButton">Loss Test</string>
     <string name="TraceResultField"> </string>
+    <string name="title_activity_loss">Loss Test</string>
 
 </resources>

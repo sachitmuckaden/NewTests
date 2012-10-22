@@ -26,12 +26,12 @@ public class MainActivity extends Activity {
             }
         });
         
-        /*losstestbutton.setOnClickListener(new View.OnClickListener() {
+        losstestbutton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 	          	Intent i= new Intent(getApplicationContext(),LossTestActivity.class);
 	        	startActivity(i);
             }
-        });*/
+        });
         
                 
         
