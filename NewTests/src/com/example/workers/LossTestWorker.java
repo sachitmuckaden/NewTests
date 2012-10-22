@@ -14,6 +14,9 @@ public class LossTestWorker implements Runnable
 	private static final String SERVER_ADDRESS = "ruggles.gtnoise.net";
 	private static final int PORT = 9916;
 	private static final String REQUEST_ACCEPTED = "Request Accepted";
+	private static final int NUMBER_OF_PACKETS = 1000;
+	private static final int PACKET_SIZE = 100; 
+	private static final int THREAD_SLEEP_TIME = 100;
 	public double loss; 
 	private DatagramPacket getLossTestPacket()
 	{
@@ -57,7 +60,7 @@ public class LossTestWorker implements Runnable
 			clientSocket = new DatagramSocket();
 			clientSocket.connect(InetAddress.getByName(SERVER_ADDRESS), PORT);
 			clientSocket.send(getRequestPacket());
-			receive_data = new byte[100];
+			receive_data = new byte[PACKET_SIZE];
 			DatagramPacket receive_packet = new DatagramPacket(receive_data, receive_data.length);
 			clientSocket.receive(receive_packet);
 			String received = new String(receive_packet.getData(),0,receive_packet.getLength());
@@ -65,15 +68,15 @@ public class LossTestWorker implements Runnable
 			if(received.equals(REQUEST_ACCEPTED))
 			{
 				Log.d("Loss Test worker", "Starting to send");
-				for (int i = 0; i<1000; i++)
+				for (int i = 0; i<NUMBER_OF_PACKETS; i++)
 				{
 					clientSocket.send(mPacket);
-					Thread.sleep(100);
+					Thread.sleep(THREAD_SLEEP_TIME);
 				}
 				clientSocket.send(getEndPacket());
 				clientSocket.receive(receive_packet);
 				int numberofpackets = Integer.parseInt(new String(receive_packet.getData(), 0 , receive_packet.getLength()));
-				loss = (double) numberofpackets/10.0;
+				loss = (double) numberofpackets/ (double) NUMBER_OF_PACKETS*100.0;
 			}
 			received = null;
 		
