@@ -17,19 +17,24 @@ class LostTestServer
 	public static DatagramPacket getStartPacket(InetAddress client_addr, int port)
 	{
 		String request_accepted = "Request Accepted";
-		DatagramPacket start_packet = new DatagramPacket(request_accepted.getBytes(), request_accepted.getBytes().length, client_addr, port);
-		return start_packet;
+		return new DatagramPacket(request_accepted.getBytes(), request_accepted.getBytes().length, client_addr, port);
 	}
 	public static DatagramPacket getDataPacket(InetAddress client_addr, int port, int count)
 	{
 		String result = "" +count;
-		DatagramPacket data_packet = new DatagramPacket(result.getBytes(), result.getBytes().length, client_addr, port);
-		return data_packet;
+		return new DatagramPacket(result.getBytes(), result.getBytes().length, client_addr, port);
+		
 	}
 	public static String getRequestBuffer()
 	{
 		String client_request = "startrequest";
 		return client_request;
+	}
+	public static DatagramPacket getAckPacket(InetAddress client_addr, int port)
+	{
+		byte[] ack_buffer = new byte[1];
+		ack_buffer[0] = 1;
+		return new DatagramPacket(ack_buffer, ack_buffer.length, client_addr, port);
 	}
 	public static void main(String[] args)
 	{
@@ -54,6 +59,7 @@ class LostTestServer
 					//System.out.println(getRequestBuffer());
 					if(received.equals(getRequestBuffer()))
 					{
+						
 						server_socket.send(getStartPacket(receive_packet.getAddress(), receive_packet.getPort()));
 						int count = 0;
 						server_socket.receive(receive_packet);
@@ -62,7 +68,11 @@ class LostTestServer
 						while(!received.equals(END_STRING))
 						{
 							count++;
+							server_socket.send(getAckPacket(receive_packet.getAddress(), receive_packet.getPort()));
+							System.out.println("Waiting to receive");
 							server_socket.receive(receive_packet);
+							System.out.println("Sending ACK");
+							received = null;
 							received = new String(receive_packet.getData(), 0 , receive_packet.getLength());
 						}
 						System.out.println("Sending count "+count);
